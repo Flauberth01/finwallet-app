@@ -160,27 +160,32 @@ export default function SettingsScreen() {
                     text: 'Limpar',
                     style: 'destructive',
                     onPress: () => {
-                        Alert.alert(
-                            'Confirmação Final',
-                            'Tem CERTEZA ABSOLUTA? Esta ação NÃO PODE ser desfeita!',
-                            [
-                                { text: 'Cancelar', style: 'cancel' },
-                                {
-                                    text: 'Sim, Apagar Tudo',
-                                    style: 'destructive',
-                                    onPress: async () => {
-                                        try {
-                                            const { clearAllData } = await import('@/db');
-                                            await clearAllData();
-                                            Alert.alert('✅ Dados Apagados', 'Todos os seus dados foram removidos com sucesso. Reinicie o aplicativo para ver as alterações.');
-                                        } catch (error) {
-                                            console.error('Error clearing data:', error);
-                                            Alert.alert('Erro', 'Não foi possível limpar os dados.');
-                                        }
+                            Alert.alert(
+                                'Confirmação Final',
+                                'Tem CERTEZA ABSOLUTA? Esta ação NÃO PODE ser desfeita!',
+                                [
+                                    { text: 'Cancelar', style: 'cancel' },
+                                    {
+                                        text: 'Sim, Apagar Tudo',
+                                        style: 'destructive',
+                                        onPress: async () => {
+                                            try {
+                                                const { clearAllData } = await import('@/db');
+                                                await clearAllData();
+                                                
+                                                // Refresh all stores to update UI immediately
+                                                await useTransactionStore.getState().refreshAll();
+                                                await useGoalStore.getState().refreshAll();
+                                                
+                                                Alert.alert('✅ Dados Apagados', 'Todos os seus dados foram removidos com sucesso.');
+                                            } catch (error) {
+                                                console.error('Error clearing data:', error);
+                                                Alert.alert('Erro', 'Não foi possível limpar os dados.');
+                                            }
+                                        },
                                     },
-                                },
-                            ]
-                        );
+                                ]
+                            );
                     },
                 },
             ]
